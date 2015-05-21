@@ -1,0 +1,42 @@
+*~
+*.o
+*.map
+*.a
+*.so
+*.ko
+*.ko.unsigned
+*.mod.c
+*.pyc
+*.log
+*_post*
+_install
+_preinstall
+
+.*
+
+#
+# file created during kernel compiling
+#
+Module.symvers
+modules.order
+
+#
+# output directory during compiling
+#
+src/adns/build
+
+#
+# files created by ctags and cscope
+#
+cscope.sh
+cscope.files
+cscope.in.out
+cscope.out
+cscope.po.out
+tags
+
+
+#
+# dot file excluded
+#
+!.gitignore

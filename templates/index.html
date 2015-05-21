@@ -1,0 +1,11 @@
+{% extends "layout/default.html" %}
+
+
+{% block content %}
+<script type="text/javascript" src="/static/portal/js/portal.js"></script>
+<script type="text/javascript">
+var title_info_bar = '{{ title_info_bar }}';
+current_username = '{{ username }}';
+</script>
+
+{% endblock %}

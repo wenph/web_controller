@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Example</title>
+    {% include 'block/extjs_css.html' %}
+    {% include 'block/extjs_js.html' %}
+    <script type="text/javascript">
+        var starry_web = {};
+        starry_web.main_page_height = document.documentElement.clientHeight;
+        Ext.require([
+            'Ext.layout.container.*',
+            'Ext.resizer.Splitter',
+            'Ext.fx.target.Element',
+            'Ext.fx.target.Component',
+            'Ext.window.Window',
+            'Ext.app.Portlet',
+            'Ext.app.PortalColumn',
+            'Ext.app.PortalPanel',
+            'Ext.app.PortalDropZone',
+            'Ext.app.GridPortlet',
+            'Ext.app.ChartPortlet'
+        ]);
+
+        Ext.onReady(function(){
+            Ext.create('Ext.app.Portal');
+        });
+    </script>
+    <!-- </x-compile> -->
+    <script type="text/javascript" src="/static/portal/js/plugins.js"></script>
+    <script type="text/javascript" src="/static/portal/js/models.js"></script>
+</head>
+<body>
+{#{% csrf_token %}#}
+{% block content %}
+
+{% endblock %}
+{#    <span id="app-msg" style="display:none;"></span>#}
+</body>
+</html>

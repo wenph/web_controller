@@ -1,0 +1,147 @@
+{% extends 'layout/default.html' %}
+
+{% block content %}
+<script language="javascript" type="text/javascript">
+    Ext.require([
+        'Ext.layout.container.Column',
+        'MyApp.ux.DateTimeField'
+    ]);
+    Ext.onReady(function(){
+        var dns_server_info = Ext.create('Ext.data.Store', {
+            autoLoad: true,
+            storeId: 'dns-server-info-store',
+            fields: ['dns_server_name','dns_server_id'],
+            data:[
+                {dns_server_name:'test-dns-server-1',dns_server_id:'0'},
+                {dns_server_name:'test-dns-server-2',dns_server_id:'1'},
+                {dns_server_name:'test-dns-server-3',dns_server_id:'2'}
+            ]
+        });
+
+        Ext.create('Ext.Panel', {
+            renderTo: 'public-dns-template-tab-div',
+            width: '100%',
+            height: document.documentElement.clientHeight,
+            loadMask: true,
+            layout: 'border',
+            tbar: [
+                {
+                    xtype:'datetimefield',
+                    width : 230,
+                    labelWidth : 60,
+                    fieldLabel: '起始时间',
+                    format: 'Y-m-d H:i:s ',
+                    id:'stime',
+                    editable:false,
+                    allowBlank:false
+                },
+                {
+                    xtype:'datetimefield',
+                    width : 230,
+                    labelWidth : 60,
+                    fieldLabel: '终止时间',
+                    format: 'Y-m-d H:i:s ',
+                    id:'etime',
+                    editable:false,
+                    allowBlank:false
+                },
+                '-',
+                {
+                    xtype: 'combo',
+                    editable: false,
+                    forceSelection: false,
+                    typeAhead: true,
+                    store: dns_server_info,
+                    labelWidth: 75,
+                    fieldLabel: '域名服务器',
+                    queryMode: 'local',
+                    displayField: 'dns_server_name',
+                    width: 300,
+                    valueField: 'dns_server_name',
+                    id: "dns-server-info-combobox",
+                    allowBlank:false
+                },
+                '-',
+                {
+                    xtype: 'button',
+                    text: '搜索',
+                    iconCls: 'icon-search',
+                    handler: starry_web.dns_qps_search
+                }
+            ]
+        });
+    });
+
+    starry_web.dns_qps_search = function(){
+        var commit_info = starry_web.validate_from_params();
+        if (!commit_info) {
+            return;
+        }
+        console.log(commit_info);
+        Ext.Ajax.request({
+            url: '/public_dns/get_data_by_time',
+            method: "post",
+            params:  JSON.stringify(commit_info),
+            success: function (response) {
+                var resopnse_info = JSON.parse(response.responseText);
+                console.log(resopnse_info);
+            },
+            failure: function (response) {
+                starry_web.plugin.response_exception(response);
+            }
+        });
+    };
+
+    starry_web.validate_from_params = function () {
+        var stime_obj = Ext.getCmp('stime').value;
+        var etime_obj = Ext.getCmp('etime').value;
+        var stime = Ext.Date.format(stime_obj, 'Y-m-d H:i:s');
+        var etime = Ext.Date.format(etime_obj, 'Y-m-d H:i:s');
+        var dns_server_info_combobox = Ext.getCmp('dns-server-info-combobox').value;
+        if (!stime) {
+            alert("请输入起始时间！");
+            return false;
+        }
+        if (!etime) {
+            alert("请输入终止时间！");
+            return false;
+        }
+        if(stime_obj > etime_obj){
+            alert('终止时间必须大于起始时间');
+            return false;
+        }
+        if (!dns_server_info_combobox) {
+            alert("请输入域名服务器！");
+            return false;
+        }
+        else{
+            param = {
+                'stime':stime,
+                'etime':etime,
+                'dns_server':dns_server_info_combobox
+            };
+            return param;
+        }
+    };
+
+    starry_web.zone_name_verification = function () {
+        Ext.Ajax.request({
+            method: "post",
+            url: '/domain/search/zone_name_verification/',
+            params: {"zone_name": Ext.getCmp('domain-search-zone-name').value || ""},
+            success: function (response) {
+                var resopnse_info = JSON.parse(response.responseText);
+                if (resopnse_info.result == "success") {
+                    Ext.getCmp('domain-online-search-button').enable(true);
+                } else {
+                    Ext.getCmp('domain-online-search-button').disable(true);
+                }
+            }
+        })
+    };
+</script>
+<div id="public-dns-template-tab-div">
+</div>
+<div id="public-dns-template-body-div">
+</div>
+{% endblock %}
